@@ -1,0 +1,11 @@
+pydantic
+python-dotenv
+langchain
+langchain_openai
+langchain_groq
+langchain_core
+langchain_community
+langgraph
+openai
+duckduckgo-search
+amadeus
