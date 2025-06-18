@@ -1,5 +1,4 @@
-# Project
-AI Travel Agent and Expense Planner
+# AI Travel Agent and Expense Planner
 
 ## Overview
 An intelligent, real-time travel assistant and budgeting planner built using LangChain, LangGraph, and custom API-powered tools. The system generates comprehensive travel plans and expense estimates for any destination using weather, accommodation, currency, and attraction data.
