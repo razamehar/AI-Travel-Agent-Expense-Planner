@@ -9,3 +9,4 @@ langgraph
 openai
 duckduckgo-search
 amadeus
+forex-python
