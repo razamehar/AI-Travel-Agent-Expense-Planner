@@ -123,7 +123,8 @@ def get_top_attractions(city: str) -> Union[List[Tuple[str, str]], str]:
         "query": "attractions",
         "near": city,
         "limit": 10,
-        "sort": "POPULARITY"
+        "sort": "POPULARITY",
+        "categories": "16000,13018,16032"
     }
 
     try:
