@@ -8,7 +8,7 @@ import os
 load_dotenv()
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
 FOURSQUARE_API_KEY = os.getenv("FOURSQUARE_API_KEY")
-FOREX_API_KEY = os.getenv("FOREX_API_KEY")
+EXCHANGERATE_API_KEY = os.getenv("EXCHANGERATE_API_KEY")
 
 
 @tool
@@ -152,45 +152,6 @@ def get_top_attractions(city: str) -> Union[List[Tuple[str, str]], str]:
     except requests.RequestException as e:
         return f"Error retrieving data from Foursquare API: {str(e)}"
 
-@tool
-def convert_currency(amount: float, from_currency: str, to_currency: str) -> str:
-    """
-    Convert a monetary amount from one currency to another using the Forex API.
-
-    Args:
-        amount (float): The amount of money to convert.
-        from_currency (str): The source currency code (e.g., "USD").
-        to_currency (str): The target currency code (e.g., "EUR").
-
-    Returns:
-        str: A string showing the converted amount or an error message.
-    """
-    if not FOREX_API_KEY:
-        return "Forex API key is missing."
-
-    url = f"https://api.apilayer.com/fixer/convert"
-    params = {
-        "from": from_currency.upper(),
-        "to": to_currency.upper(),
-        "amount": amount
-    }
-    headers = {
-        "apikey": FOREX_API_KEY
-    }
-
-    try:
-        response = requests.get(url, params=params, headers=headers)
-        data = response.json()
-
-        if response.status_code != 200 or not data.get("success", False):
-            return f"Conversion failed: {data.get('error', {}).get('info', 'Unknown error')}"
-
-        converted_amount = data.get("result")
-        return f"{amount} {from_currency.upper()} = {converted_amount:.2f} {to_currency.upper()}"
-
-    except requests.exceptions.RequestException as e:
-        return f"Request error: {e}"
-
 
 @tool
 def get_accommodation(city: str) -> List[str]:
@@ -268,8 +229,8 @@ def multiply_costs(cost: float, multiplier: float) -> float:
 
 
 @tool
-def calculate_total_expense(*costs: float) -> float:
-    """Calculate total expense from multiple costs"""
+def calculate_total_expense(costs: list[float]) -> float:
+    """Calculate total expense from a list of costs"""
     return sum(costs)
 
 
@@ -277,3 +238,35 @@ def calculate_total_expense(*costs: float) -> float:
 def calculate_daily_budget(total_cost: float, days: int) -> float:
     """Calculate daily budget"""
     return total_cost / days if days else 0
+
+
+@tool("convert_currency", description="Convert amount from one currency to another, e.g., convert 100 USD to EUR")
+def convert_currency(amount: float, from_currency: str, to_currency: str) -> str:
+    """
+    Convert a monetary amount from one currency to another using ExchangeRate-API.
+
+    Args:
+        amount (float): The amount of money to convert.
+        from_currency (str): The source currency code (e.g., "USD").
+        to_currency (str): The target currency code (e.g., "EUR").
+
+    Returns:
+        str: A string showing the converted amount or an error message.
+    """
+    if not EXCHANGERATE_API_KEY:
+        return "ExchangeRate-API key is missing."
+
+    url = f"https://v6.exchangerate-api.com/v6/{EXCHANGERATE_API_KEY}/pair/{from_currency.upper()}/{to_currency.upper()}/{amount}"
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+
+        if data.get("result") != "success":
+            return f"Conversion failed: {data.get('error-type', 'Unknown error')}"
+
+        converted_amount = data.get("conversion_result")
+        return f"{amount} {from_currency.upper()} = {converted_amount:.2f} {to_currency.upper()}"
+
+    except requests.exceptions.RequestException as e:
+        return f"Request error: {e}"
