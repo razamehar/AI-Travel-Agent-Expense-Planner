@@ -35,8 +35,8 @@ def ask_user_for_trip_info() -> Query:
     end_date = get_optional_date("Enter your preferred end date (YYYY-MM-DD), or press Enter to skip: ")
 
     duration = get_optional_int("Enter the duration of the trip in days (press Enter to auto-calculate): ")
-    budget = get_optional_float("Enter your total trip budget (press Enter to skip): ")
-    to_currency = get_optional_str("Enter your currency ((default is EUR): ")
+    to_currency = get_optional_str("Enter your currency (default is EUR): ") or "EUR"
+
 
     travelers = get_optional_int("How many people are traveling? (default is 1): ", default=1)
     trip_type = get_optional_str("Trip type (family, honeymoon, adventure, solo, business) [optional]: ")
@@ -49,7 +49,6 @@ def ask_user_for_trip_info() -> Query:
         duration=duration,
         start_date=start_date,
         end_date=end_date,
-        budget=budget,
         from_currency="EUR",
         to_currency=to_currency,
         travelers=travelers,

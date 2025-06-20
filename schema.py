@@ -8,12 +8,16 @@ class Query(BaseModel):
     start_date: Optional[date] = Field(None, description="Preferred start date (YYYY-MM-DD)")
     end_date: Optional[date] = Field(None, description="Preferred end date (YYYY-MM-DD)")
 
-    budget: Optional[float] = Field(None, ge=1, description="Total trip budget (must be >= 1)")
+
     from_currency: Literal["EUR"] = Field("EUR", description="Currency is fixed to EUR")
-    to_currency: Optional[str] = Field("EUR", description="Currency to convert to for planning (default: EUR)")
+    to_currency: str = Field("EUR", description="Currency given by the user")
 
     travelers: Optional[int] = Field(1, ge=1, description="Number of travelers (default: 1, must be >= 1)")
-    trip_type: Optional[str] = Field(None, description="Trip type: e.g., family, honeymoon, adventure, etc.")
+
+    # You can extend the allowed trip types here or keep as str for flexibility
+    trip_type: Optional[Literal["solo", "family", "honeymoon", "adventure", "business", "other"]] = Field(
+        None, description="Trip type: e.g., solo, family, honeymoon, adventure, business, other"
+    )
 
     interests: Optional[List[str]] = Field(
         None,
@@ -32,11 +36,8 @@ class Query(BaseModel):
         if self.start_date and self.end_date:
             if self.end_date < self.start_date:
                 raise ValueError("End date cannot be before start date.")
-            # Calculate duration is not provided or is None
-            if self.duration is None:
-                self.duration = (self.end_date - self.start_date).days + 1
-
-        if self.to_currency is None:
-            self.to_currency = "EUR"
-
+            calculated_duration = (self.end_date - self.start_date).days + 1
+            # If duration is missing or inconsistent, correct it
+            if self.duration is None or self.duration != calculated_duration:
+                self.duration = calculated_duration
         return self
