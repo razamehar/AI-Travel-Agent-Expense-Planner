@@ -152,14 +152,10 @@ def get_top_attractions(city: str) -> Union[List[Tuple[str, str]], str]:
     except requests.RequestException as e:
         return f"Error retrieving data from Foursquare API: {str(e)}"
 
-
 @tool
 def convert_currency(amount: float, from_currency: str, to_currency: str) -> str:
     """
-    Convert a monetary amount from one currency to another by searching DuckDuckGo.
-
-    This function performs a search to find the conversion rate and returns a snippet
-    containing both currency codes and the converted amount if available.
+    Convert a monetary amount from one currency to another using the Forex API.
 
     Args:
         amount (float): The amount of money to convert.
@@ -167,19 +163,33 @@ def convert_currency(amount: float, from_currency: str, to_currency: str) -> str
         to_currency (str): The target currency code (e.g., "EUR").
 
     Returns:
-        str: A snippet containing conversion information or "Conversion not found."
+        str: A string showing the converted amount or an error message.
     """
-    search = DuckDuckGoSearchResults(output_format='list')
-    query = f"{amount} {from_currency} to {to_currency}"
-    results = search.invoke(query)
-    if not results:
-        return "Conversion not found."
-    for item in results:
-        title = item.get("title", "").strip()
-        snippet = item.get("snippet", "")
-        if from_currency in snippet and to_currency in snippet:
-            return snippet
-    return "Conversion not found."
+    if not FOREX_API_KEY:
+        return "Forex API key is missing."
+
+    url = f"https://api.apilayer.com/fixer/convert"
+    params = {
+        "from": from_currency.upper(),
+        "to": to_currency.upper(),
+        "amount": amount
+    }
+    headers = {
+        "apikey": FOREX_API_KEY
+    }
+
+    try:
+        response = requests.get(url, params=params, headers=headers)
+        data = response.json()
+
+        if response.status_code != 200 or not data.get("success", False):
+            return f"Conversion failed: {data.get('error', {}).get('info', 'Unknown error')}"
+
+        converted_amount = data.get("result")
+        return f"{amount} {from_currency.upper()} = {converted_amount:.2f} {to_currency.upper()}"
+
+    except requests.exceptions.RequestException as e:
+        return f"Request error: {e}"
 
 
 @tool
