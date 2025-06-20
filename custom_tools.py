@@ -111,7 +111,6 @@ def get_top_attractions(city: str) -> Union[List[Tuple[str, str]], str]:
     if not api_key:
         return "Foursquare API key not found. Please set the FOURSQUARE_API_KEY environment variable."
 
-    # Endpoint to get places in city (using text search with category 'attractions')
     url = "https://api.foursquare.com/v3/places/search"
 
     headers = {
