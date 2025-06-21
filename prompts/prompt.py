@@ -47,7 +47,6 @@ You must:
      * Total estimated trip cost (hotel + daily)
      * Converted total cost into the requested currency
      * Average daily budget in the converted currency
-   - A clear statement about whether the provided budget is sufficient or not.
 
 5. Format the final output clearly and conversationally, including emojis for friendly tone.
 
@@ -85,7 +84,6 @@ city=['Bangkok'] duration=5 budget=100000.0 from_currency='EUR' to_currency='PKR
 - Converted to PKR: 146,600 PKR  
 - Average daily budget: 29,320 PKR per day  
 
-Your budget is 100,000 EUR (~18,000,000 PKR), so you have a comfortable budget for your trip. Enjoy your adventure! ✈️🌅
 
 ---
 
@@ -99,13 +97,3 @@ Begin by calling the required tools and gathering all necessary info.
 
 """
 )
-
-
-
-class APIKeysConfig:
-    def __init__(self):
-        self.weather_api_key = os.getenv("WEATHER_API_KEY")
-        self.foursquare_api_key = os.getenv("FOURSQUARE_API_KEY")
-        self.forex_api_key = os.getenv("FOREX_API_KEY")
-        self.hotels_api_key = os.getenv("HOTELS_API_KEY")
-        self.hotels_secret_key = os.getenv("HOTELS_SECRET_KEY")
